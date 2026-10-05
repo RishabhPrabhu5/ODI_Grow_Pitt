@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Common Ground Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a quiet top bar, a one-line overview of the four departments, then one working view
+   (Beds = projects per department, Season = Pittsburgh growing-season timeline, Roots = who works with whom). */
+:root {
+  --bg: #f5f7f2;
+  --surface: #ffffff;
+  --sunk: #edf1ea;
+  --ink: #1c261f;
+  --muted: #5d6a60;
+  --line: #dce3d7;
+  --accent: #2f5d3a;
+  --accent-ink: #ffffff;
+  --frost: #6f8fa6;
+
+  --ops: #8a5a3b;      /* soil */
+  --school: #a57a0c;   /* sunflower */
+  --community: #3e7d4a;/* leaf */
+  --farm: #8e3b5e;     /* beet */
+  --ops-soft: #f1e8e1;
+  --school-soft: #f6eed6;
+  --community-soft: #e3efe4;
+  --farm-soft: #f3e3ea;
+
+  --shadow: 0 1px 2px rgba(28, 38, 31, .06), 0 6px 20px rgba(28, 38, 31, .06);
+
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --r: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111713; --surface: #18201a; --sunk: #141b16; --ink: #e5ebe3; --muted: #9aa79c;
+    --line: #2a352d; --accent: #8cc69a; --accent-ink: #10180f; --frost: #8fb0c7;
+    --ops: #cf9a74; --school: #e2b948; --community: #7fbf8b; --farm: #d388a9;
+    --ops-soft: #2a211b; --school-soft: #2a2516; --community-soft: #1b2a1e; --farm-soft: #2b1c23;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111713; --surface: #18201a; --sunk: #141b16; --ink: #e5ebe3; --muted: #9aa79c;
+  --line: #2a352d; --accent: #8cc69a; --accent-ink: #10180f; --frost: #8fb0c7;
+  --ops: #cf9a74; --school: #e2b948; --community: #7fbf8b; --farm: #d388a9;
+  --ops-soft: #2a211b; --school-soft: #2a2516; --community-soft: #1b2a1e; --farm-soft: #2b1c23;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; line-height: 1.2; }
+.eyebrow {
+  font: 500 11px/1 var(--font-data); letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: clamp(16px, 3vw, 32px); }
+
+/* ---------- top bar ---------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar .wrap { display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+.brand svg { flex: none; }
+.brand-name { font-family: var(--font-display); font-size: 20px; line-height: 1.1; }
+.brand-sub { font-size: 12px; color: var(--muted); }
+.tabs { display: flex; gap: 2px; background: var(--sunk); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.tab {
+  border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font-size: 14px; color: var(--muted);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.bar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.switch { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; user-select: none; }
+.switch input { position: absolute; opacity: 0; pointer-events: none; }
+.switch .track {
+  width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .2s;
+}
+.switch .track::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--surface); transition: transform .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.switch input:checked + .track { background: var(--accent); }
+.switch input:checked + .track::after { transform: translateX(14px); }
+.switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn {
+  border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 999px; font-size: 14px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+.btn.primary:hover { filter: brightness(1.08); }
+
+/* ---------- public banner ---------- */
+.public-banner {
+  background: var(--community-soft); border-bottom: 1px solid var(--line); font-size: 13px;
+}
+.public-banner .wrap { padding-block: 8px; display: flex; gap: 8px; align-items: center; }
+
+/* ---------- intro + overview ---------- */
+.intro { padding-block: 28px 8px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 32px; align-items: end; }
+.intro h1 { font-size: clamp(26px, 3.4vw, 36px); }
+.intro p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+.season-chip { font: 500 12px/1.4 var(--font-data); color: var(--muted); text-align: right; }
+.season-chip strong { color: var(--ink); font-weight: 500; }
+
+.overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding-block: 20px; }
+.dept-tile {
+  text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r);
+  padding: 14px 16px; display: grid; gap: 10px; transition: border-color .15s, opacity .15s;
+}
+.dept-tile:hover { border-color: var(--muted); }
+.dept-tile[aria-pressed="false"] { opacity: .45; }
+.dept-tile .top { display: flex; align-items: baseline; gap: 8px; }
+.dept-tile .name { font-weight: 600; font-size: 14px; }
+.dept-tile .count { margin-left: auto; font: 500 22px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.dept-tile .lead { font-size: 12px; color: var(--muted); }
+.stagebar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--sunk); gap: 2px; }
+.stagebar span { display: block; height: 100%; }
+.stagelegend { display: flex; gap: 10px; font: 400 11px/1 var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+
+/* ---------- toolbar ---------- */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding-block: 4px 18px; border-bottom: 1px solid var(--line); }
+.search {
+  display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface);
+  border-radius: 999px; padding: 6px 12px; min-width: 0; flex: 1 1 220px; max-width: 340px;
+}
+.search input { border: 0; background: transparent; outline: none; width: 100%; min-width: 0; font-size: 14px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 11px; font-size: 13px; color: var(--muted);
+  display: inline-flex; gap: 6px; align-items: center;
+}
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip[aria-pressed="true"] svg { color: var(--bg); }
+.toolbar label.sel { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); margin-left: auto; }
+select {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+}
+
+main { padding-block: 22px 64px; }
+
+/* ---------- beds (board) ---------- */
+.beds { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 18px; align-items: start; }
+.bed { display: grid; gap: 10px; min-width: 0; }
+.bed-head { display: flex; align-items: center; gap: 8px; padding: 0 2px 8px; border-bottom: 2px solid var(--c, var(--line)); }
+.bed-head h2 { font-size: 18px; }
+.bed-head .n { margin-left: auto; font: 500 12px/1 var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; }
+.bed-empty { font-size: 13px; color: var(--muted); padding: 14px; border: 1px dashed var(--line); border-radius: var(--r); text-align: center; }
+
+.card {
+  text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r);
+  padding: 14px; display: grid; gap: 10px; transition: border-color .15s, transform .15s, box-shadow .15s; min-width: 0;
+}
+.card:hover { border-color: color-mix(in srgb, var(--c) 60%, var(--line)); box-shadow: var(--shadow); transform: translateY(-1px); }
+.card .meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.card .meta .dept-name { color: var(--c); font-weight: 600; }
+.card h3 { font: 600 15px/1.35 var(--font-body); }
+.card p { margin: 0; font-size: 13px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card .foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.card .foot .who { margin-right: auto; display: inline-flex; align-items: center; gap: 6px; }
+.avatar {
+  width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; flex: none;
+  font: 600 10px/1 var(--font-body); background: var(--sunk); color: var(--ink); border: 1px solid var(--line);
+}
+.shared {
+  display: inline-flex; align-items: center; gap: 4px; font: 500 11px/1 var(--font-data); padding: 4px 7px; border-radius: 999px;
+  background: var(--sunk); color: var(--muted);
+}
+.stage-pill {
+  display: inline-flex; align-items: center; gap: 5px; font: 500 11px/1 var(--font-data); letter-spacing: .03em;
+  padding: 4px 8px 4px 6px; border-radius: 999px; background: var(--soft); color: var(--c); margin-left: auto;
+}
+.stage-pill svg { width: 13px; height: 13px; }
+
+/* ---------- season (timeline) ---------- */
+.season-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.season { min-width: 760px; font-size: 13px; }
+.season-row { display: grid; grid-template-columns: 240px minmax(0, 1fr); border-bottom: 1px solid var(--line); }
+.season-row:last-child { border-bottom: 0; }
+.season-row .label { padding: 8px 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.season-row .label button { border: 0; background: none; padding: 0; text-align: left; color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.season-row .label button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.season-row .track { position: relative; min-height: 34px; }
+.season-head { position: sticky; top: 0; background: var(--sunk); }
+.season-head .track { display: grid; grid-template-columns: repeat(12, 1fr); }
+.season-head .track span { font: 500 11px/34px var(--font-data); color: var(--muted); padding-left: 6px; border-left: 1px solid var(--line); text-transform: uppercase; letter-spacing: .06em; }
+.season-group .label { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.season-group { background: var(--sunk); }
+.gridlines { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); pointer-events: none; }
+.gridlines span { border-left: 1px solid var(--line); opacity: .6; }
+.grow-band { position: absolute; top: 0; bottom: 0; background: var(--community); opacity: .06; pointer-events: none; }
+.marker { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px dashed var(--frost); pointer-events: none; }
+.marker.today { border-left: 2px solid var(--ink); }
+.marker-label { position: absolute; top: 4px; left: 5px; font: 500 10px/1.2 var(--font-data); white-space: nowrap; color: var(--frost); }
+.marker.today .marker-label { color: var(--ink); }
+.span-bar {
+  position: absolute; top: 8px; height: 18px; border-radius: 999px; background: var(--soft); border: 1px solid var(--c);
+  display: flex; align-items: center; gap: 4px; padding: 0 8px; color: var(--c); overflow: hidden; border-width: 1px;
+  font: 500 10px/1 var(--font-data); white-space: nowrap; cursor: pointer;
+}
+.span-bar svg { width: 12px; height: 12px; flex: none; }
+.season-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--muted); padding: 12px 2px 0; }
+.season-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.season-legend i { display: inline-block; width: 16px; border-top: 1.5px dashed var(--frost); }
+.season-legend i.solid { border-top: 2px solid var(--ink); }
+.season-legend i.band { height: 10px; border: 0; background: var(--community); opacity: .18; border-radius: 2px; }
+
+/* ---------- roots (partners) ---------- */
+.roots { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.roots-map { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 8px; overflow-x: auto; }
+.roots-map svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.roots-map text { font-family: var(--font-body); }
+.root-path { fill: none; stroke-linecap: round; transition: opacity .2s, stroke-width .2s; }
+.roots-map.focusing .root-path { opacity: .08; }
+.roots-map.focusing .root-path.on { opacity: .9; }
+.roots-map .pnode { cursor: pointer; }
+.roots-map .pnode:hover text, .roots-map .pnode.on text { font-weight: 600; }
+.side-panel { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.side-panel h2 { font-size: 20px; }
+.side-panel .hint { color: var(--muted); font-size: 13px; margin: 0; }
+.mini-list { display: grid; gap: 6px; }
+.mini {
+  display: flex; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: transparent;
+  text-align: left; width: 100%; font-size: 13px; min-width: 0;
+}
+.mini:hover { border-color: var(--muted); }
+.mini .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: auto; }
+.crossover { display: grid; gap: 8px; }
+.crossover h3 { font: 600 13px/1.3 var(--font-body); }
+
+/* ---------- drawer ---------- */
+.scrim { position: fixed; inset: 0; background: rgba(12, 18, 14, .35); z-index: 40; opacity: 0; transition: opacity .2s; }
+.scrim.show { opacity: 1; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); z-index: 41; background: var(--surface);
+  border-left: 1px solid var(--line); box-shadow: var(--shadow); overflow-y: auto; transform: translateX(100%); transition: transform .25s ease;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 24px calc(env(safe-area-inset-bottom, 0px) + 32px);
+  display: grid; gap: 20px; align-content: start;
+}
+.drawer.show { transform: none; }
+.drawer-top { display: flex; align-items: center; gap: 10px; }
+.icon-btn { border: 1px solid var(--line); background: transparent; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; margin-left: auto; flex: none; }
+.drawer h2 { font-size: 26px; }
+.drawer .summary { margin: 0; color: var(--ink); }
+.facts { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px 14px; margin: 0; font-size: 14px; }
+.facts dt { color: var(--muted); font-size: 12px; padding-top: 2px; }
+.facts dd { margin: 0; min-width: 0; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--sunk); }
+.stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.stage-step { display: grid; justify-items: center; gap: 6px; font: 500 11px/1.2 var(--font-data); color: var(--muted); padding: 10px 4px; border-radius: 8px; text-align: center; }
+.stage-step svg { width: 22px; height: 22px; opacity: .45; }
+.stage-step.done svg { opacity: 1; }
+.stage-step.current { background: var(--soft); color: var(--c); }
+.stage-step.current svg { opacity: 1; }
+.note { border-left: 3px solid var(--school); background: var(--school-soft); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 14px; }
+.note .eyebrow { display: block; margin-bottom: 4px; }
+.updates { display: grid; gap: 12px; }
+.update { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; font-size: 13px; }
+.update time { font: 400 12px/1.5 var(--font-data); color: var(--muted); }
+
+/* ---------- modal form ---------- */
+.modal {
+  position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(12, 18, 14, .4);
+}
+.modal-card {
+  width: min(560px, 100%); max-height: calc(100% - 32px); overflow-y: auto; background: var(--surface); border-radius: 14px;
+  border: 1px solid var(--line); box-shadow: var(--shadow); padding: 24px; display: grid; gap: 18px;
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { display: grid; gap: 6px; font-size: 13px; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field span { color: var(--muted); }
+.field input, .field textarea, .field select {
+  border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 9px 11px; font-size: 14px; width: 100%;
+}
+.field textarea { min-height: 76px; resize: vertical; }
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.err { color: var(--farm); font-size: 13px; margin: 0; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translate(-50%, 20px); opacity: 0;
+  background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 60; transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+footer .wrap { padding-block: 18px; display: flex; gap: 8px 24px; flex-wrap: wrap; justify-content: space-between; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1080px) {
+  .beds { --cols: 2 !important; }
+  .overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .roots { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .beds { --cols: 1 !important; }
+  .intro { grid-template-columns: minmax(0, 1fr); }
+  .season-chip { text-align: left; }
+  .toolbar label.sel { margin-left: 0; }
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .facts dd { margin-bottom: 10px; }
+  .tab .tab-label-long { display: none; }
+}
+@media (max-width: 420px) {
+  .overview { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="17" cy="17" r="16" fill="var(--community-soft)" stroke="var(--line)"/>
+        <path d="M17 26 V14" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M17 17 C 11 17, 9 13, 9 9 C 14 9, 17 12, 17 17 Z" fill="var(--community)"/>
+        <path d="M17 14 C 22 14, 25 11, 25 7 C 20 7, 17 9.5, 17 14 Z" fill="var(--accent)"/>
+        <path d="M10 26 H24" stroke="var(--ops)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="brand-name">Common Ground</div>
+        <div class="brand-sub">Grow Pittsburgh · shared project board</div>
+      </div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="tab-beds" data-view="beds" aria-selected="true">Beds<span class="tab-label-long">&nbsp;by team</span></button>
+      <button class="tab" role="tab" id="tab-season" data-view="season" aria-selected="false">Season</button>
+      <button class="tab" role="tab" id="tab-roots" data-view="roots" aria-selected="false">Roots<span class="tab-label-long">&nbsp;&amp; partners</span></button>
+    </div>
+    <div class="bar-actions">
+      <label class="switch" for="public-toggle" title="Hide staff-only notes and internal projects before showing this to volunteers or partners">
+        <input type="checkbox" id="public-toggle">
+        <span class="track" aria-hidden="true"></span>
+        Partner view
+      </label>
+      <button class="btn primary" id="add-btn" type="button">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Plant a project
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="public-banner" id="public-banner" hidden>
+  <div class="wrap">
+    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="none" stroke="var(--community)" stroke-width="1.5"/><path d="M4.5 7.2l1.8 1.8 3.3-3.6" fill="none" stroke="var(--community)" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Partner view is on. Staff notes and internal-only projects are hidden, so this screen is safe to share with volunteers and partners.
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="intro">
+    <div>
+      <div class="eyebrow" id="intro-eyebrow">Fall 2026 · all four departments</div>
+      <h1 id="intro-title">What's growing across Grow Pittsburgh</h1>
+      <p id="intro-copy">Every project from Operations, School Gardens, Community Projects and Farm Education in one place, with who's leading it, which partners are involved, and how far along it is.</p>
+    </div>
+    <div class="season-chip" id="season-chip"></div>
+  </section>
+
+  <section class="overview" id="overview" aria-label="Department overview"></section>
+
+  <div class="toolbar">
+    <label class="search" for="q">
+      <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search projects, people, partners, neighborhoods" autocomplete="off">
+    </label>
+    <div class="chips" id="stage-chips" role="group" aria-label="Filter by growth stage"></div>
+    <label class="sel" for="group-by" id="group-wrap">Arrange beds by
+      <select id="group-by">
+        <option value="dept">Department</option>
+        <option value="stage">Growth stage</option>
+      </select>
+    </label>
+  </div>
+</div>
+
+<main class="wrap" id="main"></main>
+
+<footer>
+  <div class="wrap">
+    <span>Common Ground · a mockup prototype for Grow Pittsburgh. All projects, people and dates shown are sample data.</span>
+    <span>Stages: Seed = planning · Sprout = getting started · Bloom = in full swing · Harvest = wrapped up</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-labelledby="d-title" role="dialog"></aside>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <form class="modal-card" id="add-form" novalidate>
+    <div>
+      <div class="eyebrow">New project</div>
+      <h2 id="m-title" style="font-size:24px;margin-top:6px">Plant a project</h2>
+    </div>
+    <div class="form-grid">
+      <label class="field full" for="f-title"><span>Project name</span><input id="f-title" name="title" placeholder="e.g. Pollinator strip at Arsenal Middle"></label>
+      <label class="field" for="f-dept"><span>Department</span><select id="f-dept" name="dept"></select></label>
+      <label class="field" for="f-stage"><span>Stage</span><select id="f-stage" name="stage"></select></label>
+      <label class="field" for="f-lead"><span>Lead</span><input id="f-lead" name="lead" placeholder="Who's the point person?"></label>
+      <label class="field" for="f-hood"><span>Neighborhood or site</span><input id="f-hood" name="hood" placeholder="e.g. Hazelwood"></label>
+      <label class="field" for="f-start"><span>Starts</span><select id="f-start" name="start"></select></label>
+      <label class="field" for="f-end"><span>Ends</span><select id="f-end" name="end"></select></label>
+      <label class="field full" for="f-partners"><span>Partners (comma separated)</span><input id="f-partners" name="partners" placeholder="e.g. Pittsburgh Public Schools, Citiparks"></label>
+      <label class="field full" for="f-summary"><span>What is it, in a sentence or two?</span><textarea id="f-summary" name="summary"></textarea></label>
+    </div>
+    <p class="err" id="f-err" hidden></p>
+    <div class="form-actions">
+      <button type="button" class="btn" id="cancel-btn">Cancel</button>
+      <button type="submit" class="btn primary">Add to the board</button>
+    </div>
+  </form>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  // ---------- reference data ----------
+  const DEPTS = {
+    ops:       { name: 'Operations',         short: 'Ops',       lead: 'Marcus Bell, Director of Operations' },
+    school:    { name: 'School Gardens',     short: 'Schools',   lead: 'Redding, Director of School Gardens' },
+    community: { name: 'Community Projects', short: 'Community', lead: 'Tanya Ortiz, Community Projects Manager' },
+    farm:      { name: 'Farm Education',     short: 'Farm Ed',   lead: 'Devon Park, Farm Education Manager' },
+  };
+  const DEPT_IDS = Object.keys(DEPTS);
+  const STAGES = [
+    { id: 'seed',    label: 'Seed',    desc: 'Planning' },
+    { id: 'sprout',  label: 'Sprout',  desc: 'Getting started' },
+    { id: 'bloom',   label: 'Bloom',   desc: 'In full swing' },
+    { id: 'harvest', label: 'Harvest', desc: 'Wrapped up' },
+  ];
+  const STAGE_IDX = Object.fromEntries(STAGES.map((s, i) => [s.id, i]));
+  const BED_ORDER = { bloom: 0, sprout: 1, seed: 2, harvest: 3 }; // active work first, finished work last
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const TODAY = new Date(2026, 9, 5); // board "as of" date for the sample data
+  // Pittsburgh (USDA zone 6b) average frost dates
+  const LAST_FROST = new Date(2026, 4, 1);
+  const FIRST_FROST = new Date(2026, 9, 20);
+
+  const STAGE_ICON = {
+    seed: '<svg viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="9" rx="3.4" ry="4.6" transform="rotate(-25 8 9)" fill="currentColor" opacity=".9"/><path d="M6.6 6.8c.8 1 1.2 2.4 1 3.9" stroke="var(--surface)" stroke-width="1" fill="none" stroke-linecap="round"/></svg>',
+    sprout: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14.5V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M8 9C4.5 9 3 6.8 3 4.2 6.3 4.2 8 6 8 9Z" fill="currentColor"/><path d="M8 8c0-2.9 1.8-4.8 5-4.8 0 2.7-1.8 4.8-5 4.8Z" fill="currentColor" opacity=".75"/></svg>',
+    bloom: '<svg viewBox="0 0 16 16" aria-hidden="true"><g fill="currentColor"><circle cx="8" cy="4" r="2.6"/><circle cx="12" cy="7.5" r="2.6"/><circle cx="10.5" cy="12" r="2.6"/><circle cx="5.5" cy="12" r="2.6"/><circle cx="4" cy="7.5" r="2.6"/></g><circle cx="8" cy="8.6" r="2.1" fill="var(--surface)"/><circle cx="8" cy="8.6" r="1.2" fill="currentColor"/></svg>',
+    harvest: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 7.5h11l-1.4 6.2a1 1 0 0 1-1 .8H4.9a1 1 0 0 1-1-.8Z" fill="currentColor"/><path d="M5 7.5c0-2.4 1.3-4 3-4s3 1.6 3 4" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M6 10.6l1.4 1.4 2.8-2.9" stroke="var(--surface)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  };
+
+  // ---------- sample projects ----------
+  const SAMPLE = [
+    { id: 'p1', title: 'Raised-bed rebuild at Pittsburgh Faison K-5', dept: 'school', stage: 'bloom', lead: 'Redding', team: ['Aisha Green', 'Marcus Bell'],
+      partners: ['Pittsburgh Public Schools', 'PTO volunteers'], collab: ['ops'], hood: 'Homewood', start: 3, end: 10, public: true,
+      summary: 'Replacing six rotted cedar beds and adding an accessible-height bed so every grade can plant this spring and fall.',
+      next: 'Ops to deliver 4 cu yd of compost before Oct 14 fall planting day.', updates: [['Sep 29', 'Fall greens seeded with 3rd grade.'], ['Aug 18', 'Beds 1-4 rebuilt; lumber left for 5-6.']] },
+    { id: 'p2', title: 'Garden-based learning curriculum, grades 3-5', dept: 'school', stage: 'sprout', lead: 'Aisha Green', team: ['Redding', 'Devon Park'],
+      partners: ['Pittsburgh Public Schools', 'Penn State Extension'], collab: ['farm'], hood: 'District-wide', start: 6, end: 12, public: true,
+      summary: 'Twelve lessons tying the school garden to PA science standards: soil, pollination, seasons and food systems.',
+      next: 'Farm Ed reviewing the soil-testing lesson; draft due Oct 20.', updates: [['Sep 22', 'Lessons 1-5 drafted and teacher-reviewed.']] },
+    { id: 'p3', title: 'Seed-to-snack tastings', dept: 'school', stage: 'bloom', lead: 'Jordan Lee', team: ['Aisha Green'],
+      partners: ['Greater Pittsburgh Community Food Bank'], collab: [], hood: '9 partner schools', start: 4, end: 11, public: true,
+      summary: 'Monthly classroom tastings using produce students grew themselves, with a take-home recipe card for families.',
+      next: 'Order October recipe cards (Spanish + English).', updates: [['Sep 30', '214 students reached in September.']] },
+    { id: 'p4', title: 'New school garden site selection, 2027 cohort', dept: 'school', stage: 'seed', lead: 'Redding', team: ['Marcus Bell'],
+      partners: ['Pittsburgh Public Schools'], collab: ['ops'], hood: 'Carrick, Beltzhoover', start: 9, end: 12, public: false,
+      summary: 'Scoring four schools that applied for a garden on sun exposure, water access and teacher champions.',
+      next: 'Ops site walk-throughs scheduled week of Oct 12.', updates: [['Oct 1', 'Applications closed with 4 schools.']] },
+
+    { id: 'p5', title: 'Hazelwood community garden expansion', dept: 'community', stage: 'bloom', lead: 'Tanya Ortiz', team: ['Sam Whitfield', 'Marcus Bell'],
+      partners: ['Pittsburgh Parks Conservancy', 'Hazelwood Initiative'], collab: ['ops'], hood: 'Hazelwood', start: 3, end: 11, public: true,
+      summary: 'Adding 14 plots and a shared herb spiral after a 30-household waitlist built up last season.',
+      next: 'Fence install pending city permit.', updates: [['Sep 25', '10 of 14 new plots claimed.'], ['Jul 2', 'Soil test results came back clean.']] },
+    { id: 'p6', title: 'Garden leader peer network', dept: 'community', stage: 'sprout', lead: 'Sam Whitfield', team: ['Tanya Ortiz'],
+      partners: ['Carnegie Library of Pittsburgh'], collab: ['farm'], hood: 'Citywide', start: 8, end: 12, public: true,
+      summary: 'Quarterly meetups where volunteer garden leaders swap seeds, tools and fixes. Hosted at library branches.',
+      next: 'Book Hill District branch room for November.', updates: [['Sep 14', 'First meetup: 26 leaders from 18 gardens.']] },
+    { id: 'p7', title: 'Larimer orchard planting', dept: 'community', stage: 'seed', lead: 'Tanya Ortiz', team: ['Devon Park'],
+      partners: ['Tree Pittsburgh', 'Larimer Consensus Group'], collab: ['farm'], hood: 'Larimer', start: 10, end: 12, public: true,
+      summary: 'Twenty fruit trees on a vacant lot, with neighbors trained to prune and harvest them.',
+      next: 'Confirm tree delivery date with Tree Pittsburgh.', updates: [['Oct 2', 'Neighborhood vote approved the site.']] },
+    { id: 'p8', title: 'Rain barrel giveaway', dept: 'community', stage: 'harvest', lead: 'Sam Whitfield', team: [],
+      partners: ['Allegheny County Sanitary Authority'], collab: [], hood: 'Garfield, Lawrenceville', start: 4, end: 6, public: true,
+      summary: '120 rain barrels installed at community gardens to cut municipal water use during dry spells.',
+      next: '', updates: [['Jun 28', 'All 120 barrels installed.']] },
+
+    { id: 'p9', title: 'Braddock Farms fall CSA', dept: 'farm', stage: 'bloom', lead: 'Devon Park', team: ['Lena Kurtz'],
+      partners: ['Braddock Carnegie Library'], collab: ['ops'], hood: 'Braddock', start: 6, end: 11, public: true,
+      summary: 'Weekly vegetable shares for 60 households, paired with a short growing tip at each pickup.',
+      next: 'Ops to fix the walk-in cooler before Oct 10 pickup.', updates: [['Oct 1', 'Week 16 of 22 delivered.']] },
+    { id: 'p10', title: 'Urban Farmer Training cohort', dept: 'farm', stage: 'bloom', lead: 'Lena Kurtz', team: ['Devon Park'],
+      partners: ['Penn State Extension', 'Chatham University'], collab: ['community'], hood: 'Braddock + Shiloh Farm', start: 3, end: 11, public: true,
+      summary: 'A 32-week apprenticeship for 12 new growers, from bed prep to selling at market.',
+      next: 'Graduates matched with Community Projects garden plots.', updates: [['Sep 26', 'Cohort ran its first farm stand.']] },
+    { id: 'p11', title: 'Field trip program for school gardens', dept: 'farm', stage: 'sprout', lead: 'Devon Park', team: ['Jordan Lee'],
+      partners: ['Pittsburgh Public Schools'], collab: ['school'], hood: 'Braddock Farms', start: 8, end: 11, public: true,
+      summary: 'Bringing school-garden classes to a working farm so students see the same crops at production scale.',
+      next: 'School Gardens to share fall class schedule.', updates: [['Sep 19', 'Pilot trip with 2 classes went well.']] },
+    { id: 'p12', title: 'Winter workshop series', dept: 'farm', stage: 'seed', lead: 'Lena Kurtz', team: [],
+      partners: ['Phipps Conservatory'], collab: [], hood: 'Online + Oakland', start: 11, end: 12, public: true,
+      summary: 'Seed starting, season extension and soil care classes for home and community gardeners.',
+      next: 'Pick 6 topics from the summer survey.', updates: [] },
+
+    { id: 'p13', title: 'Garden Resource Center fall distribution', dept: 'ops', stage: 'bloom', lead: 'Marcus Bell', team: ['Ray Dunn'],
+      partners: ['Citiparks'], collab: ['community', 'school'], hood: 'Garden Resource Center', start: 8, end: 11, public: true,
+      summary: 'Garlic, cover-crop seed, compost and tools for 140 member gardens and 22 school gardens.',
+      next: 'Pick-up days Oct 11 and Oct 18.', updates: [['Oct 3', '1,200 lbs of garlic seed received.']] },
+    { id: 'p14', title: 'Shared tool and truck calendar', dept: 'ops', stage: 'sprout', lead: 'Ray Dunn', team: ['Marcus Bell'],
+      partners: [], collab: ['school', 'community', 'farm'], hood: 'Internal', start: 9, end: 12, public: false,
+      summary: 'One booking calendar for the box truck, tiller and auger so departments stop double-booking them.',
+      next: 'Each department head to list their November needs.', updates: [['Sep 30', 'Two double-bookings in Sept. prompted this.']] },
+    { id: 'p15', title: 'Water access upgrades', dept: 'ops', stage: 'harvest', lead: 'Marcus Bell', team: ['Ray Dunn'],
+      partners: ['Pittsburgh Water', 'Pittsburgh Parks Conservancy'], collab: ['community'], hood: '6 garden sites', start: 2, end: 6, public: true,
+      summary: 'New spigots and hose bibs at six gardens that were hauling water by bucket.',
+      next: '', updates: [['Jun 12', 'All six sites have running water.']] },
+    { id: 'p16', title: 'Volunteer intake and safety training', dept: 'ops', stage: 'bloom', lead: 'Priya Shah', team: [],
+      partners: ['PittServes'], collab: ['school', 'community', 'farm'], hood: 'All sites', start: 1, end: 12, public: true,
+      summary: 'One sign-up form and a 20-minute orientation that every volunteer completes before their first workday.',
+      next: 'Translate the orientation into Spanish and Nepali.', updates: [['Sep 30', '412 volunteers onboarded this year.']] },
+  ];
+
+  // ---------- state ----------
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  const added = store.get('cg-added', []);
+  const projects = [...SAMPLE, ...added];
+  const state = {
+    view: store.get('cg-view', 'beds'),
+    group: store.get('cg-group', 'dept'),
+    depts: new Set(DEPT_IDS),
+    stage: 'all',
+    q: '',
+    isPublic: false,
+    partner: null,
+  };
+  if (/^#(beds|season|roots)$/.test(location.hash)) state.view = location.hash.slice(1);
+
+  // ---------- helpers ----------
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const initials = n => n.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const deptVars = d => `--c: var(--${d}); --soft: var(--${d}-soft);`;
+  const stageOf = id => STAGES[STAGE_IDX[id]];
+  const monthRange = p => p.start === p.end ? MONTHS[p.start - 1] : `${MONTHS[p.start - 1]} – ${MONTHS[p.end - 1]}`;
+  const yearFrac = d => (d.getMonth() + (d.getDate() - 1) / new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()) / 12 * 100;
+  const allDepts = p => [p.dept, ...p.collab.filter(c => c !== p.dept)];
+
+  function visible() {
+    const q = state.q.trim().toLowerCase();
+    return projects.filter(p => {
+      if (state.isPublic && !p.public) return false;
+      if (!allDepts(p).some(d => state.depts.has(d))) return false;
+      if (state.stage !== 'all' && p.stage !== state.stage) return false;
+      if (q) {
+        const hay = [p.title, p.summary, p.lead, ...p.team, ...p.partners, p.hood, DEPTS[p.dept].name].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function stagePill(p) {
+    const s = stageOf(p.stage);
+    return `<span class="stage-pill" title="${s.desc}">${STAGE_ICON[s.id]}${s.label}</span>`;
+  }
+
+  // ---------- intro + overview ----------
+  function renderIntro() {
+    const days = Math.round((FIRST_FROST - TODAY) / 864e5);
+    $('#season-chip').innerHTML = days > 0
+      ? `As of Oct 5, 2026<br><strong>${days} days</strong> to average first frost`
+      : `As of Oct 5, 2026<br>Past first frost`;
+    $('#intro-eyebrow').textContent = state.isPublic ? 'Fall 2026 · shared with partners' : 'Fall 2026 · all four departments';
+  }
+
+  function renderOverview() {
+    const pool = projects.filter(p => !state.isPublic || p.public);
+    $('#overview').innerHTML = DEPT_IDS.map(d => {
+      const mine = pool.filter(p => p.dept === d);
+      const by = STAGES.map(s => mine.filter(p => p.stage === s.id).length);
+      const shared = pool.filter(p => p.dept !== d && p.collab.includes(d)).length;
+      const total = mine.length || 1;
+      const op = [.35, .6, .85, 1];
+      return `<button class="dept-tile" type="button" data-dept="${d}" aria-pressed="${state.depts.has(d)}" style="${deptVars(d)}">
+        <div class="top"><span class="dot" style="background:var(--${d})"></span><span class="name">${DEPTS[d].name}</span><span class="count">${mine.length}</span></div>
+        <div class="stagebar" aria-hidden="true">${by.map((n, i) => n ? `<span style="width:${n / total * 100}%;background:var(--${d});opacity:${op[i]}"></span>` : '').join('')}</div>
+        <div class="stagelegend">${STAGES.map((s, i) => `<span>${s.label} ${by[i]}</span>`).join('')}</div>
+        <div class="lead">${state.isPublic ? '' : esc(DEPTS[d].lead) + ' · '}helping on ${shared} other ${shared === 1 ? 'project' : 'projects'}</div>
+      </button>`;
+    }).join('');
+  }
+
+  function renderStageChips() {
+    const opts = [{ id: 'all', label: 'All stages' }, ...STAGES];
+    $('#stage-chips').innerHTML = opts.map(s => `<button class="chip" type="button" data-stage="${s.id}" aria-pressed="${state.stage === s.id}" ${s.desc ? `title="${s.desc}"` : ''}>
+      ${s.id !== 'all' ? `<span style="width:13px;height:13px;display:inline-flex;color:var(--accent)">${STAGE_ICON[s.id]}</span>` : ''}${s.label}</button>`).join('');
+  }
+
+  // ---------- beds ----------
+  function card(p) {
+    const d = DEPTS[p.dept];
+    const others = p.collab.filter(c => c !== p.dept);
+    return `<button class="card" type="button" data-open="${p.id}" style="${deptVars(p.dept)}">
+      <div class="meta"><span class="dot" style="background:var(--${p.dept})"></span><span class="dept-name">${d.name}</span>${stagePill(p)}</div>
+      <h3>${esc(p.title)}</h3>
+      <p>${esc(p.summary)}</p>
+      <div class="foot">
+        <span class="who"><span class="avatar" aria-hidden="true">${esc(initials(p.lead))}</span>${esc(p.lead)}</span>
+        ${others.length ? `<span class="shared" title="Also involves ${others.map(o => DEPTS[o].name).join(', ')}">${others.map(o => `<span class="dot" style="background:var(--${o})"></span>`).join('')} +${others.length} team${others.length > 1 ? 's' : ''}</span>` : ''}
+        ${p.partners.length ? `<span class="shared" title="${esc(p.partners.join(', '))}">${p.partners.length} partner${p.partners.length > 1 ? 's' : ''}</span>` : ''}
+      </div>
+    </button>`;
+  }
+
+  function renderBeds(list) {
+    const groups = state.group === 'dept'
+      ? DEPT_IDS.filter(d => state.depts.has(d)).map(d => ({
+          key: d, title: DEPTS[d].name, color: `var(--${d})`,
+          items: list.filter(p => p.dept === d).sort((a, b) => BED_ORDER[a.stage] - BED_ORDER[b.stage]),
+          sub: list.filter(p => p.dept !== d && p.collab.includes(d)).length,
+        }))
+      : STAGES.filter(s => state.stage === 'all' || s.id === state.stage).map(s => ({
+          key: s.id, title: s.label, color: 'var(--accent)', desc: s.desc, icon: STAGE_ICON[s.id],
+          items: list.filter(p => p.stage === s.id),
+        }));
+    const cols = Math.min(4, Math.max(1, groups.length));
+    return `<div class="beds" style="--cols:${cols}">${groups.map(g => `
+      <section class="bed" style="--c:${g.color}" aria-label="${esc(g.title)}">
+        <div class="bed-head">
+          ${g.icon ? `<span style="width:18px;height:18px;display:inline-flex;color:var(--accent)">${g.icon}</span>` : `<span class="dot" style="background:${g.color}"></span>`}
+          <h2>${esc(g.title)}</h2>
+          ${g.desc ? `<span class="eyebrow" style="margin-left:4px">${g.desc}</span>` : ''}
+          <span class="n">${g.items.length}${g.sub ? ` · +${g.sub} shared` : ''}</span>
+        </div>
+        ${g.items.length ? g.items.map(card).join('') : `<div class="bed-empty">Nothing planted here with these filters.</div>`}
+      </section>`).join('')}</div>`;
+  }
+
+  // ---------- season ----------
+  function renderSeason(list) {
+    const lf = yearFrac(LAST_FROST), ff = yearFrac(FIRST_FROST), td = yearFrac(TODAY);
+    const overlay = (labels) => `
+      <div class="gridlines">${MONTHS.map(() => '<span></span>').join('')}</div>
+      <div class="grow-band" style="left:${lf}%;width:${ff - lf}%"></div>
+      <div class="marker" style="left:${lf}%">${labels ? '<span class="marker-label">Last frost</span>' : ''}</div>
+      <div class="marker" style="left:${ff}%">${labels ? '<span class="marker-label">First frost</span>' : ''}</div>
+      <div class="marker today" style="left:${td}%">${labels ? '<span class="marker-label" style="top:18px">Today</span>' : ''}</div>`;
+    let rows = '';
+    DEPT_IDS.filter(d => state.depts.has(d)).forEach(d => {
+      const items = list.filter(p => p.dept === d).sort((a, b) => a.start - b.start || a.end - b.end);
+      if (!items.length) return;
+      rows += `<div class="season-row season-group"><div class="label"><span class="dot" style="background:var(--${d})"></span>${DEPTS[d].name}</div><div class="track">${overlay(rows === '')}</div></div>`;
+      rows += items.map(p => {
+        const left = (p.start - 1) / 12 * 100, width = (p.end - p.start + 1) / 12 * 100;
+        return `<div class="season-row"><div class="label"><button type="button" data-open="${p.id}" title="${esc(p.title)}">${esc(p.title)}</button></div>
+          <div class="track">${overlay(false)}
+            <span class="span-bar" data-open="${p.id}" role="button" tabindex="0" style="${deptVars(p.dept)}left:calc(${left}% + 3px);width:calc(${width}% - 6px)" title="${esc(p.title)} · ${monthRange(p)} · ${stageOf(p.stage).label}">${STAGE_ICON[p.stage]}${stageOf(p.stage).label}</span>
+          </div></div>`;
+      }).join('');
+    });
+    if (!rows) return `<div class="bed-empty">No projects match these filters.</div>`;
+    return `<div class="season-scroll"><div class="season">
+      <div class="season-row season-head"><div class="label eyebrow" style="line-height:18px">2026 · project</div><div class="track">${MONTHS.map(m => `<span>${m}</span>`).join('')}</div></div>
+      ${rows}
+    </div></div>
+    <div class="season-legend">
+      <span><i class="band"></i>Outdoor growing season</span>
+      <span><i></i>Average frost dates, Pittsburgh (zone 6b)</span>
+      <span><i class="solid"></i>Today, Oct 5</span>
+    </div>`;
+  }
+
+  // ---------- roots ----------
+  function renderRoots(list) {
+    const partnerMap = new Map();
+    list.forEach(p => p.partners.forEach(name => {
+      if (!partnerMap.has(name)) partnerMap.set(name, { name, projects: [], depts: new Set() });
+      const e = partnerMap.get(name);
+      e.projects.push(p);
+      allDepts(p).forEach(d => e.depts.add(d));
+    }));
+    const partners = [...partnerMap.values()].sort((a, b) => b.depts.size - a.depts.size || b.projects.length - a.projects.length || a.name.localeCompare(b.name));
+    const depts = DEPT_IDS.filter(d => state.depts.has(d));
+    if (!partners.length) return `<div class="bed-empty">No partners match these filters.</div>`;
+
+    const W = 820, rowH = 30, top = 30;
+    const H = Math.max(depts.length * 90, partners.length * rowH) + top * 2;
+    const dx = 210, px = 510;
+    const dy = i => top + (H - top * 2) / (depts.length) * (i + .5);
+    const py = i => top + (H - top * 2) / partners.length * (i + .5);
+    let paths = '';
+    partners.forEach((pt, j) => {
+      depts.forEach((d, i) => {
+        if (!pt.depts.has(d)) return;
+        const n = pt.projects.filter(p => allDepts(p).includes(d)).length;
+        const y1 = dy(i), y2 = py(j), mx = (dx + px) / 2;
+        paths += `<path class="root-path" data-p="${esc(pt.name)}" data-d="${d}" d="M${dx} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${px - 8} ${y2}" stroke="var(--${d})" stroke-width="${1 + n * 1.2}" opacity=".45"/>`;
+      });
+    });
+    const dnodes = depts.map((d, i) => `
+      <g><circle cx="${dx}" cy="${dy(i)}" r="9" fill="var(--${d})"/>
+      <text x="${dx - 18}" y="${dy(i) + 5}" text-anchor="end" font-size="15" font-weight="600" fill="var(--ink)">${DEPTS[d].name}</text></g>`).join('');
+    const pnodes = partners.map((pt, j) => `
+      <g class="pnode${state.partner === pt.name ? ' on' : ''}" data-partner="${esc(pt.name)}" tabindex="0" role="button" aria-label="${esc(pt.name)}">
+        <rect x="${px - 6}" y="${py(j) - rowH / 2}" width="${W - px + 6}" height="${rowH}" fill="transparent"/>
+        <circle cx="${px}" cy="${py(j)}" r="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="${px + 14}" y="${py(j) + 4.5}" font-size="13" fill="var(--ink)">${esc(pt.name)}</text>
+        <text x="${W - 6}" y="${py(j) + 4.5}" font-size="11" text-anchor="end" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${pt.depts.size > 1 ? pt.depts.size + ' teams' : ''}</text>
+      </g>`).join('');
+
+    const sel = state.partner && partnerMap.get(state.partner);
+    const multi = partners.filter(p => p.depts.size > 1);
+    const side = sel ? `
+      <div><div class="eyebrow">Partner</div><h2 style="margin-top:6px">${esc(sel.name)}</h2></div>
+      <div class="tags">${[...sel.depts].map(d => `<span class="tag" style="display:inline-flex;gap:6px;align-items:center"><span class="dot" style="background:var(--${d})"></span>${DEPTS[d].name}</span>`).join('')}</div>
+      <p class="hint">${sel.depts.size > 1 ? `Works with ${sel.depts.size} departments. Worth a shared check-in so they don't hear from each team separately.` : 'Works with one department so far.'}</p>
+      <div class="mini-list">${sel.projects.map(mini).join('')}</div>
+      <button class="btn" type="button" data-clear-partner style="justify-self:start">Show all partners</button>`
+      : `
+      <div><div class="eyebrow">Who we work with</div><h2 style="margin-top:6px">${partners.length} partners, ${depts.length} departments</h2></div>
+      <p class="hint">Each root runs from a department to a partner it works with. Thicker roots mean more shared projects. Select a partner to see its projects.</p>
+      <div class="crossover">
+        <h3>Shared by more than one team</h3>
+        ${multi.length ? multi.map(pt => `<button class="mini" type="button" data-partner="${esc(pt.name)}"><span class="t">${esc(pt.name)}</span>${[...pt.depts].map(d => `<span class="dot" style="background:var(--${d})"></span>`).join('')}</button>`).join('') : '<p class="hint">None with these filters.</p>'}
+      </div>`;
+    return `<div class="roots">
+      <div class="roots-map${sel ? ' focusing' : ''}" id="roots-map"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Departments connected to partner organizations">${paths}${dnodes}${pnodes}</svg></div>
+      <aside class="side-panel">${side}</aside>
+    </div>`;
+  }
+  function mini(p) {
+    return `<button class="mini" type="button" data-open="${p.id}" style="${deptVars(p.dept)}"><span class="dot" style="background:var(--${p.dept})"></span><span class="t">${esc(p.title)}</span>${stagePill(p)}</button>`;
+  }
+
+  // ---------- drawer ----------
+  let lastFocus = null;
+  function openDrawer(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    lastFocus = document.activeElement;
+    const d = DEPTS[p.dept];
+    const si = STAGE_IDX[p.stage];
+    const others = p.collab.filter(c => c !== p.dept);
+    const dr = $('#drawer');
+    dr.setAttribute('style', deptVars(p.dept));
+    dr.innerHTML = `
+      <div class="drawer-top">
+        <span class="dot" style="background:var(--${p.dept})"></span><span style="font-weight:600;color:var(--c)">${d.name}</span>
+        <button class="icon-btn" type="button" data-close aria-label="Close project details">
+          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div><h2 id="d-title">${esc(p.title)}</h2></div>
+      <p class="summary">${esc(p.summary)}</p>
+      <div class="stages" aria-label="Growth stage: ${stageOf(p.stage).label}">
+        ${STAGES.map((s, i) => `<div class="stage-step ${i < si ? 'done' : ''} ${i === si ? 'current' : ''}" style="${i <= si ? 'color:var(--c)' : ''}">${STAGE_ICON[s.id]}${s.label}<span style="opacity:.75;font-size:10px">${s.desc}</span></div>`).join('')}
+      </div>
+      <dl class="facts">
+        <dt>Lead</dt><dd><span class="who" style="display:inline-flex;gap:8px;align-items:center"><span class="avatar">${esc(initials(p.lead))}</span>${esc(p.lead)}</span></dd>
+        ${p.team.length ? `<dt>Team</dt><dd>${p.team.map(esc).join(', ')}</dd>` : ''}
+        <dt>Where</dt><dd>${esc(p.hood || '—')}</dd>
+        <dt>When</dt><dd style="font-variant-numeric:tabular-nums">${monthRange(p)} 2026</dd>
+        <dt>Partners</dt><dd>${p.partners.length ? `<div class="tags">${p.partners.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</div>` : 'None yet'}</dd>
+        <dt>Also involves</dt><dd>${others.length ? `<div class="tags">${others.map(o => `<span class="tag" style="display:inline-flex;gap:6px;align-items:center"><span class="dot" style="background:var(--${o})"></span>${DEPTS[o].name}</span>`).join('')}</div>` : 'Just this team'}</dd>
+      </dl>
+      ${!state.isPublic && p.next ? `<div class="note"><span class="eyebrow">Staff note · next step</span>${esc(p.next)}</div>` : ''}
+      ${p.updates && p.updates.length ? `<div><div class="eyebrow" style="margin-bottom:10px">Recent updates</div><div class="updates">${p.updates.map(([t, u]) => `<div class="update"><time>${esc(t)}</time><span>${esc(u)}</span></div>`).join('')}</div></div>` : ''}
+      ${!p.public && !state.isPublic ? `<p class="hint" style="margin:0;font-size:12px;color:var(--muted)">Internal project. Hidden in partner view.</p>` : ''}`;
+    const scrim = $('#scrim');
+    scrim.hidden = false;
+    requestAnimationFrame(() => { scrim.classList.add('show'); dr.classList.add('show'); });
+    dr.setAttribute('aria-hidden', 'false');
+    $('[data-close]', dr).focus();
+  }
+  function closeDrawer() {
+    const dr = $('#drawer'), scrim = $('#scrim');
+    if (!dr.classList.contains('show')) return;
+    dr.classList.remove('show'); scrim.classList.remove('show');
+    dr.setAttribute('aria-hidden', 'true');
+    setTimeout(() => { scrim.hidden = true; }, 220);
+    if (lastFocus) lastFocus.focus();
+  }
+
+  // ---------- render ----------
+  function render() {
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === state.view)));
+    $('#group-wrap').hidden = state.view !== 'beds';
+    $('#public-banner').hidden = !state.isPublic;
+    renderIntro();
+    renderOverview();
+    renderStageChips();
+    const list = visible();
+    const main = $('#main');
+    main.innerHTML = state.view === 'beds' ? renderBeds(list) : state.view === 'season' ? renderSeason(list) : renderRoots(list);
+    if (state.view === 'roots' && state.partner) {
+      main.querySelectorAll('.root-path').forEach(p => p.classList.toggle('on', p.dataset.p === state.partner));
+    }
+  }
+
+  // ---------- events ----------
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-view],[data-dept],[data-stage],[data-open],[data-close],[data-partner],[data-clear-partner]');
+    if (!t) return;
+    if (t.dataset.view) { state.view = t.dataset.view; store.set('cg-view', state.view); render(); }
+    else if (t.dataset.dept) {
+      const d = t.dataset.dept;
+      const allOn = state.depts.size === DEPT_IDS.length;
+      if (allOn) state.depts = new Set([d]);                       // first click focuses one team
+      else if (state.depts.has(d) && state.depts.size === 1) state.depts = new Set(DEPT_IDS); // clicking it again shows all
+      else state.depts.has(d) ? state.depts.delete(d) : state.depts.add(d);
+      render();
+    }
+    else if (t.dataset.stage) { state.stage = t.dataset.stage; render(); }
+    else if (t.dataset.open) openDrawer(t.dataset.open);
+    else if (t.hasAttribute('data-close')) closeDrawer();
+    else if (t.dataset.partner) { state.partner = state.partner === t.dataset.partner ? null : t.dataset.partner; render(); }
+    else if (t.hasAttribute('data-clear-partner')) { state.partner = null; render(); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { if (!$('#modal').hidden) closeModal(); else closeDrawer(); }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-open],[role="button"][data-partner]')) {
+      e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+  });
+  $('#scrim').addEventListener('click', closeDrawer);
+  $('#main').addEventListener('mouseover', e => {
+    const n = e.target.closest('.pnode'); const map = $('#roots-map');
+    if (!map || state.partner) return;
+    map.classList.toggle('focusing', !!n);
+    map.querySelectorAll('.root-path').forEach(p => p.classList.toggle('on', !!n && p.dataset.p === n.dataset.partner));
+  });
+  $('#main').addEventListener('mouseleave', () => {
+    const map = $('#roots-map'); if (map && !state.partner) map.classList.remove('focusing');
+  });
+  $('#q').addEventListener('input', e => { state.q = e.target.value; render(); });
+  const gb = $('#group-by'); gb.value = state.group;
+  gb.addEventListener('change', e => { state.group = e.target.value; store.set('cg-group', state.group); render(); });
+  $('#public-toggle').addEventListener('change', e => { state.isPublic = e.target.checked; state.partner = null; closeDrawer(); render(); });
+
+  // ---------- add project ----------
+  const opt = (v, l, sel) => `<option value="${v}"${sel ? ' selected' : ''}>${l}</option>`;
+  $('#f-dept').innerHTML = DEPT_IDS.map(d => opt(d, DEPTS[d].name)).join('');
+  $('#f-stage').innerHTML = STAGES.map(s => opt(s.id, `${s.label} · ${s.desc}`)).join('');
+  $('#f-start').innerHTML = MONTHS.map((m, i) => opt(i + 1, m + ' 2026', i === 9)).join('');
+  $('#f-end').innerHTML = MONTHS.map((m, i) => opt(i + 1, m + ' 2026', i === 11)).join('');
+  function openModal() { $('#modal').hidden = false; $('#f-err').hidden = true; $('#f-title').focus(); }
+  function closeModal() { $('#modal').hidden = true; $('#add-btn').focus(); }
+  $('#add-btn').addEventListener('click', openModal);
+  $('#cancel-btn').addEventListener('click', closeModal);
+  $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+  $('#add-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const title = f.get('title').trim(), lead = f.get('lead').trim();
+    const start = +f.get('start'), end = +f.get('end');
+    const err = $('#f-err');
+    if (!title || !lead) { err.textContent = 'Add a project name and a lead so others know who to ask.'; err.hidden = false; return; }
+    if (end < start) { err.textContent = 'The end month comes before the start month. Pick a later end month.'; err.hidden = false; return; }
+    const p = {
+      id: 'u' + Date.now(), title, dept: f.get('dept'), stage: f.get('stage'), lead, team: [],
+      partners: f.get('partners').split(',').map(s => s.trim()).filter(Boolean), collab: [],
+      hood: f.get('hood').trim(), start, end, public: true, summary: f.get('summary').trim() || 'No description yet.',
+      next: '', updates: [['Oct 5', 'Added to the board.']],
+    };
+    projects.push(p); added.push(p); store.set('cg-added', added);
+    e.target.reset();
+    $('#f-start').value = 10; $('#f-end').value = 12;
+    closeModal();
+    state.depts = new Set(DEPT_IDS); state.stage = 'all';
+    render();
+    toast(`Planted “${title}” in ${DEPTS[p.dept].name}`);
+  });
+
+  let tt;
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
