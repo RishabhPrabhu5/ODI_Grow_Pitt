@@ -74,6 +74,61 @@ header .wrap { display: flex; align-items: center; gap: 14px 24px; flex-wrap: wr
 .tabs { display: flex; gap: 2px; background: var(--sunk); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
 .tab { border: 0; background: transparent; padding: 6px 16px; border-radius: 999px; font-size: 14px; color: var(--muted); }
 .tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.tab { display: inline-flex; align-items: center; gap: 6px; }
+.menu { position: relative; }
+.menu-pop { position: absolute; top: 100%; left: 0; padding-top: 8px; z-index: 30; display: none; }
+.menu:hover .menu-pop, .menu:focus-within .menu-pop, .menu.open .menu-pop { display: block; }
+.menu.closed .menu-pop { display: none; }
+.menu-list { width: 260px; max-width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 6px; display: grid; gap: 2px; }
+.menu-item { border: 0; background: transparent; text-align: left; padding: 9px 10px; border-radius: 8px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 10px; align-items: center; }
+.menu-item:hover, .menu-item:focus-visible { background: var(--sunk); }
+.menu-item .dot { grid-row: span 2; }
+.menu-item .nm { font-size: 14px; font-weight: 500; }
+.menu-item .sub { font-size: 12px; color: var(--muted); }
+.menu-item[aria-current="page"] .nm { color: var(--c); }
+
+/* team page */
+.team-head { padding-block: 32px 8px; display: grid; gap: 10px; }
+.team-head .eyebrow { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--c); }
+.team-head h1 { font-size: clamp(28px, 3.6vw, 38px); }
+.team-head p { margin: 0; color: var(--muted); max-width: 64ch; }
+.team-meta { display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 13px; color: var(--muted); }
+.team-meta b { color: var(--ink); font-weight: 500; }
+.placeholder { font-size: 13px; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--r); padding: 10px 14px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 4px; align-content: start; }
+.stat .num { font: 400 30px/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.stat .lbl { font-size: 13px; }
+.stat .sub { font-size: 12px; color: var(--muted); }
+.section { display: grid; gap: 14px; padding-top: 32px; }
+.section > h2 { font-size: 22px; }
+.section-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { font-size: 22px; }
+.section-head span { font-size: 13px; color: var(--muted); }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; align-items: start; }
+.split { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.panel h3 { font: 600 15px/1.3 var(--font-body); }
+.panel p { margin: 0; font-size: 14px; }
+.panel .muted { color: var(--muted); font-size: 13px; }
+.garden-group { display: grid; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.garden-group:last-child { border-bottom: 0; padding-bottom: 0; }
+.garden-group .gh { display: flex; align-items: baseline; gap: 8px; }
+.garden-group .gh h3 { margin-right: auto; }
+.garden-group .gh .count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.garden-group .gd { font-size: 12px; color: var(--muted); margin: -4px 0 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--sunk); border: 1px solid var(--line); }
+.prog { display: grid; gap: 4px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.prog:last-child { border-bottom: 0; padding-bottom: 0; }
+.prog .pn { display: flex; align-items: baseline; gap: 8px; }
+.prog .pn h3 { margin-right: auto; }
+.prog .pn .big { font: 400 20px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.prog p { font-size: 13px; color: var(--muted); }
+.quote { font: 400 18px/1.4 var(--font-display); margin: 0; }
+.ahead { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.ahead li::marker { color: var(--c); }
+
 .actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .switch { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; user-select: none; }
 .switch input { position: absolute; opacity: 0; pointer-events: none; }
@@ -164,7 +219,7 @@ main { padding-block: 8px 64px; }
 footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 footer .wrap { padding-block: 18px; }
 
-@media (max-width: 1040px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1040px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } .split { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
   .board { grid-template-columns: minmax(0, 1fr); }
   .prow { grid-template-columns: minmax(0, 1fr); }
@@ -193,6 +248,15 @@ footer .wrap { padding-block: 18px; }
     </div>
     <div class="tabs" role="tablist" aria-label="Views">
       <button class="tab" role="tab" data-view="projects" aria-selected="true">Projects</button>
+      <div class="menu" id="teams-menu">
+        <button class="tab" id="teams-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-selected="false">
+          Teams
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="menu-pop">
+          <div class="menu-list" role="menu" aria-labelledby="teams-btn" id="teams-list"></div>
+        </div>
+      </div>
       <button class="tab" role="tab" data-view="partners" aria-selected="false">Partners</button>
     </div>
     <div class="actions">
@@ -208,7 +272,7 @@ footer .wrap { padding-block: 18px; }
   <div class="wrap">Partner view is on. Staff notes and internal projects are hidden, so this screen is ready to show volunteers and partners.</div>
 </div>
 
-<div class="wrap intro">
+<div class="wrap intro" id="intro">
   <div>
     <h1 id="heading">What each team is working on</h1>
     <p id="subhead"></p>
@@ -250,10 +314,46 @@ footer .wrap { padding-block: 18px; }
 <script>
 (() => {
   const DEPTS = {
-    ops:       { name: 'Operations',         lead: 'Operations Director' },
-    school:    { name: 'School Gardens',     lead: 'Redding' },
-    community: { name: 'Community Projects', lead: 'Community Projects Manager' },
-    farm:      { name: 'Farm Education',     lead: 'Farm Education Manager' },
+    ops:       { name: 'Operations',         lead: 'Operations Director', members: ['Operations team'],
+                 desc: 'Keeps everything running behind the scenes: supplies, tools, vehicles, volunteers and site maintenance.' },
+    school:    { name: 'School Gardens',     lead: 'Redding', leadTitle: 'Director of School Gardens', members: ['Redding', 'Vee', 'Victoria', 'Brandy (early childhood)'],
+                 desc: 'Builds and supports gardens at K-12 schools and early childhood centers, and trains the teachers who use them.' },
+    community: { name: 'Community Projects', lead: 'Community Projects Manager', members: ['Community team'],
+                 desc: 'Works with neighbors to build and care for community gardens in parks and public spaces.' },
+    farm:      { name: 'Farm Education',     lead: 'Farm Education Manager', members: ['Farm Education team'],
+                 desc: 'Runs Grow Pittsburgh’s urban farms and teaches people how to grow their own food.' },
+  };
+
+  // School Gardens detail, from the 2026 column of the School Garden program goals sheet.
+  const SG = {
+    stats: [
+      { n: '29,535', l: 'students with access to a school garden', s: 'Up from 26,978 in 2022-23' },
+      { n: '83', l: 'gardens built by Grow Pittsburgh', s: 'K-12, early childhood and flagship, to date' },
+      { n: '22', l: 'schools in active programming', s: '16 K-12 and 6 early childhood gardens' },
+      { n: '14', l: 'districts and specialized sites', s: '12 school districts, 2 specialized sites' },
+      { n: '594', l: 'new students reached by this year’s builds', s: '440 K-12, 154 early childhood' },
+    ],
+    gardens: [
+      { h: 'New garden build', d: 'Summer build, planted with students this fall', items: ['Northgate Jr/Sr School'] },
+      { h: 'Second year of programming', items: ['Dr. Cleveland Steward Elementary', 'Carrick High School', 'Logan Elementary'] },
+      { h: 'Established gardens re-activated', items: ['Arlington PreK-8', 'Carmalt K-8', 'Liberty K-5', 'Lincoln PreK-5', 'Manchester PreK-8', 'Westinghouse 9-12'] },
+      { h: 'Continued support', items: ['Gladiator Academy', 'Hope Learning Center'] },
+      { h: 'Supported, not built by us', d: 'Technical help and supplies', items: ['Whittier Elementary', 'Falk Laboratory School', 'Sto-Rox Jr/Sr High School', 'Crafton Elementary'] },
+      { h: 'Early childhood: new this year', items: ['Child’s Way', 'Shady Lane'] },
+      { h: 'Early childhood: second year', items: ['Crescent Early Childhood', '4Kids Early Learning Center', 'Heritage Out of School Time', 'Maple Unified Student Academy (MUSA)'] },
+    ],
+    programs: [
+      { h: 'Teacher trainings', n: '3', p: 'Season Planning & Extended Seedling Sale Hours (two sessions) and Pest Management in the School Garden.' },
+      { h: 'Winter cooking lessons', n: '18', p: 'Classroom cooking lessons using what students grew.' },
+      { h: 'Sustainability Fund', n: '2', p: 'Basic supplies for Crafton Elementary (irrigation parts, tomato stakes, gloves, seedlings) and a new shed for Westinghouse Academy.' },
+    ],
+    ahead: [
+      { t: 'New builds: possibly Gateway High School, and a PPS garden after the transition' },
+      { t: '12 K-12 gardens and 5 early childhood gardens in programming' },
+      { t: '3 teacher trainings, including a new School Garden Solutions session' },
+      { t: 'Re-activations to be set once the PPS transition is settled', internal: true },
+      { t: 'Support the 20 school gardens affected by PPS closures and reconfigurations', internal: true },
+    ],
   };
   const DEPT_IDS = Object.keys(DEPTS);
   const STATUS = {
@@ -279,7 +379,7 @@ footer .wrap { padding-block: 18px; }
       note: 'Dollar total will be updated once the Westinghouse shed is delivered this fall.' },
     { id: 's4', dept: 'school', status: 'progress', title: 'Teacher trainings', lead: 'Victoria',
       partners: [], with: [], when: '3 workshops in 2026',
-      summary: 'Workshops for teachers on Season Planning, extended seedling sale hours, and a School Garden Solutions session.',
+      summary: 'Workshops for teachers on season planning during the extended seedling sale, plus pest management in the school garden.',
       note: '' },
     { id: 's5', dept: 'school', status: 'done', title: 'Early childhood gardens at Child’s Way and Shady Lane', lead: 'Brandy',
       partners: ['Child’s Way', 'Shady Lane'], with: ['ops'], when: '2026',
@@ -318,7 +418,11 @@ footer .wrap { padding-block: 18px; }
   };
   const added = store.get('cg3-added', []);
   const projects = [...SAMPLE, ...added];
-  const state = { view: location.hash === '#partners' ? 'partners' : 'projects', q: '', isPublic: false };
+  const hash = location.hash.slice(1);
+  const state = {
+    view: hash === 'partners' ? 'partners' : DEPTS[hash] ? 'team:' + hash : 'projects',
+    q: '', isPublic: false,
+  };
 
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -326,8 +430,8 @@ footer .wrap { padding-block: 18px; }
   const names = ids => ids.map(d => DEPTS[d].name);
   const status = p => `<span class="status ${p.status}" style="--s:var(--${p.status})">${STATUS[p.status].label}</span>`;
 
-  function visible() {
-    const q = state.q.trim().toLowerCase();
+  function visible(useSearch = true) {
+    const q = useSearch ? state.q.trim().toLowerCase() : '';
     return projects.filter(p => {
       if (state.isPublic && p.internal) return false;
       if (!q) return true;
@@ -350,7 +454,7 @@ footer .wrap { padding-block: 18px; }
       const items = list.filter(p => p.dept === d).sort((a, b) => STATUS[a.status].order - STATUS[b.status].order);
       return `<section class="col" style="--c:var(--${d})" aria-label="${DEPTS[d].name}">
         <div class="col-head">
-          <div class="row"><span class="dot"></span><h2>${DEPTS[d].name}</h2><span class="n">${items.length}</span></div>
+          <div class="row"><span class="dot"></span><h2><button class="link" type="button" data-view="team:${d}" style="font:inherit;text-decoration-color:transparent">${DEPTS[d].name}</button></h2><span class="n">${items.length}</span></div>
           <div class="lead">Led by ${esc(DEPTS[d].lead)}</div>
         </div>
         ${items.length ? items.map(card).join('') : '<div class="empty">No matching projects.</div>'}
@@ -378,9 +482,90 @@ footer .wrap { padding-block: 18px; }
     </div>`;
   }
 
+  function teamPartners(d, list) {
+    const map = new Map();
+    list.filter(p => p.dept === d || p.with.includes(d)).forEach(p => p.partners.forEach(n => map.set(n, (map.get(n) || 0) + 1)));
+    return [...map.keys()].sort();
+  }
+
+  function renderTeam(d) {
+    const t = DEPTS[d];
+    const all = visible(false);
+    const own = all.filter(p => p.dept === d).sort((a, b) => STATUS[a.status].order - STATUS[b.status].order);
+    const helping = all.filter(p => p.dept !== d && p.with.includes(d));
+    const partners = teamPartners(d, all);
+    const isSchool = d === 'school';
+    return `<div style="--c:var(--${d})">
+      <section class="team-head">
+        <div class="eyebrow"><span class="dot"></span>Team</div>
+        <h1>${t.name}</h1>
+        <p>${esc(t.desc)}</p>
+        <div class="team-meta">
+          <span>Led by <b>${esc(t.lead)}</b>${t.leadTitle ? `, ${esc(t.leadTitle)}` : ''}</span>
+          <span>Team: <b>${t.members.map(esc).join(', ')}</b></span>
+        </div>
+        ${isSchool ? '' : '<div class="placeholder">Placeholder page. Fill it in with this team’s own projects and numbers, the way School Gardens does.</div>'}
+      </section>
+
+      ${isSchool ? `<section class="section">
+        <div class="section-head"><h2>2026 at a glance</h2></div>
+        <div class="stats">${SG.stats.map(x => `<div class="stat"><div class="num">${x.n}</div><div class="lbl">${x.l}</div><div class="sub">${x.s}</div></div>`).join('')}</div>
+      </section>` : ''}
+
+      <section class="section">
+        <div class="section-head"><h2>Current projects</h2><span>${own.length} led by this team</span></div>
+        ${own.length ? `<div class="card-grid">${own.map(card).join('')}</div>` : '<div class="empty">No projects yet.</div>'}
+      </section>
+
+      ${helping.length ? `<section class="section">
+        <div class="section-head"><h2>Helping other teams</h2><span>${helping.length} projects</span></div>
+        <div class="mini-list" style="display:grid;gap:8px">${helping.map(p => `<button class="link" type="button" data-open="${p.id}" style="font-size:14px;justify-self:start">${esc(p.title)} <span style="color:var(--muted)">· ${DEPTS[p.dept].name}</span></button>`).join('')}</div>
+      </section>` : ''}
+
+      ${isSchool ? `<section class="section">
+        <div class="split">
+          <div class="panel">
+            <div class="section-head"><h2>Our gardens in 2026</h2></div>
+            ${SG.gardens.map(g => `<div class="garden-group">
+              <div class="gh"><h3>${g.h}</h3><span class="count">${g.items.length}</span></div>
+              ${g.d ? `<p class="gd">${g.d}</p>` : ''}
+              <div class="chips">${g.items.map(i => `<span class="chip">${esc(i)}</span>`).join('')}</div>
+            </div>`).join('')}
+          </div>
+          <div style="display:grid;gap:20px;min-width:0">
+            <div class="panel">
+              <div class="section-head"><h2>Programs this year</h2></div>
+              ${SG.programs.map(x => `<div class="prog"><div class="pn"><h3>${x.h}</h3><span class="big">${x.n}</span></div><p>${esc(x.p)}</p></div>`).join('')}
+            </div>
+            <div class="panel">
+              <div class="section-head"><h2>What teachers say</h2></div>
+              <p class="quote">100% of K-12 and early childhood teachers surveyed said the garden improved student engagement and behavior in class.</p>
+              <p class="muted">2026 teacher survey</p>
+            </div>
+            <div class="panel">
+              <div class="section-head"><h2>Looking ahead to 2027</h2></div>
+              <ul class="ahead">${SG.ahead.filter(a => !(state.isPublic && a.internal)).map(a => `<li>${esc(a.t)}</li>`).join('')}</ul>
+            </div>
+          </div>
+        </div>
+      </section>` : ''}
+
+      <section class="section">
+        <div class="section-head"><h2>Who we work with</h2><span>${partners.length} partners</span></div>
+        ${partners.length ? `<div class="chips">${partners.map(n => `<span class="chip">${esc(n)}</span>`).join('')}</div>` : '<div class="empty">No partners listed yet.</div>'}
+      </section>
+    </div>`;
+  }
+
   function render() {
-    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === state.view)));
+    const team = state.view.startsWith('team:') ? state.view.slice(5) : null;
+    document.querySelectorAll('.tab[data-view]').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === state.view)));
+    $('#teams-btn').setAttribute('aria-selected', String(!!team));
+    $('#teams-list').innerHTML = DEPT_IDS.map(d => `<button class="menu-item" role="menuitem" type="button" data-view="team:${d}" style="--c:var(--${d})" ${team === d ? 'aria-current="page"' : ''}>
+      <span class="dot"></span><span class="nm">${DEPTS[d].name}</span><span class="sub">Led by ${esc(DEPTS[d].lead)}</span></button>`).join('');
     $('#banner').hidden = !state.isPublic;
+    $('#intro').hidden = !!team;
+    if (team) { $('#main').innerHTML = renderTeam(team); return; }
     $('#heading').textContent = state.view === 'projects' ? 'What each team is working on' : 'Who we work with';
     $('#subhead').textContent = state.view === 'projects'
       ? 'Current projects from all four departments, who’s leading them, and who they’re working with.'
@@ -424,12 +609,31 @@ footer .wrap { padding-block: 18px; }
   document.addEventListener('click', e => {
     const t = e.target.closest('[data-view],[data-open],[data-close]');
     if (!t) return;
-    if (t.dataset.view) { state.view = t.dataset.view; render(); }
+    if (t.dataset.view) {
+      state.view = t.dataset.view;
+      closeDrawer();
+      const menu = $('#teams-menu');
+      menu.classList.remove('open'); menu.classList.add('closed'); $('#teams-btn').setAttribute('aria-expanded', 'false');
+      if (document.activeElement) document.activeElement.blur();
+      render();
+      window.scrollTo(0, 0);
+    }
     else if (t.dataset.open) openDrawer(t.dataset.open);
     else closeDrawer();
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('#modal').hidden) closeModal(); else closeDrawer(); } });
   $('#scrim').addEventListener('click', closeDrawer);
+  // Teams menu: opens on hover or focus; the button also toggles it for touch screens.
+  const menu = $('#teams-menu');
+  menu.addEventListener('mouseleave', () => menu.classList.remove('closed'));
+  menu.addEventListener('mouseenter', () => menu.classList.remove('closed'));
+  $('#teams-btn').addEventListener('click', () => {
+    menu.classList.remove('closed');
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open);
+    $('#teams-btn').setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', e => { if (!menu.contains(e.target)) menu.classList.remove('open'); });
   $('#q').addEventListener('input', e => { state.q = e.target.value; render(); });
   $('#public-toggle').addEventListener('change', e => { state.isPublic = e.target.checked; closeDrawer(); render(); });
 
